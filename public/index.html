@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Snake Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="controls">
+            <div class="speed-control">
+                <label for="speedRange">Yılan Hızı:</label>
+                <input type="range" id="speedRange" min="1" max="100" value="10">
+            </div>
+            <button id="startAI">AI'yı Başlat</button>
+            <button id="stopAI">AI'yı Durdur</button>
+            <div id="stats">
+                <p>Önceki Skor: <span id="score">0</span></p>
+                <p>Jenerasyon: <span id="jenerasyon">0</span></p>
+                <p>Ortalama Skor: <span id="avgScore">0</span></p>
+                <p>Model Kaybı: <span id="loss">0</span></p>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+    <script src="neural_network.js"></script>
+</body>
+</html> 
