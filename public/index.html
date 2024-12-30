@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Snake Game</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-sun light-icon"></i>
+        <i class="fas fa-moon dark-icon"></i>
+    </button>
     <div class="container">
         <canvas id="gameCanvas"></canvas>
         <div class="controls">
@@ -21,6 +26,7 @@
             <input type="file" id="modelFile" accept=".json" style="display: none">
             <div id="stats">
                 <p>Önceki Skor: <span id="score">0</span></p>
+                <p>En Yüksek Skor: <span id="highScore">0</span></p>
                 <p>Jenerasyon: <span id="jenerasyon">0</span></p>
                 <p>Ortalama Skor: <span id="avgScore">0</span></p>
                 <p>Model Kaybı: <span id="loss">0</span></p>
@@ -29,6 +35,23 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Tema değiştirme fonksiyonu
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Kayıtlı temayı kontrol et
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
     <script src="game.js"></script>
     <script src="neural_network.js"></script>
 </body>

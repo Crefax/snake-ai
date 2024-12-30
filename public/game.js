@@ -8,6 +8,8 @@ class SnakeGame {
         this.snake = [{x: 4, y: 4}, {x: 3, y: 4}, {x: 2, y: 4}, {x: 1, y: 4}];
         this.direction = 'right';
         this.score = 0;
+        this.highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+        this.updateHighScoreDisplay();
         this.gameOver = false;
         this.speed = 10;
         this.lastMoves = new Array(10).fill('forward');
@@ -113,6 +115,8 @@ class SnakeGame {
     }
 
     move(action) {
+        if (this.gameOver) return;
+
         const head = {...this.snake[0]};
         
         // Son hareketleri güncelle
@@ -150,6 +154,11 @@ class SnakeGame {
         // Yemek kontrolü
         if (head.x === this.food.x && head.y === this.food.y) {
             this.score++;
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+                localStorage.setItem('snakeHighScore', this.highScore);
+                this.updateHighScoreDisplay();
+            }
             this.food = this.generateFood();
             return 1;
         } else {
@@ -216,11 +225,18 @@ class SnakeGame {
         this.ctx.fill();
 
         // Skor gösterimi
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--canvas-text');
         this.ctx.font = 'bold 20px Arial';
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'top';
         this.ctx.fillText(`Skor: ${this.score}`, 10, 10);
+    }
+
+    updateHighScoreDisplay() {
+        const highScoreElement = document.getElementById('highScore');
+        if (highScoreElement) {
+            highScoreElement.textContent = this.highScore;
+        }
     }
 
     reset() {
@@ -228,8 +244,9 @@ class SnakeGame {
         this.direction = 'right';
         this.score = 0;
         this.gameOver = false;
-        this.lastMoves = new Array(10).fill('forward');
         this.food = this.generateFood();
+        this.lastMoves = new Array(10).fill('forward');
+        this.updateHighScoreDisplay();
     }
 }
 

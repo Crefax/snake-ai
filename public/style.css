@@ -1,3 +1,23 @@
+:root {
+    --bg-color: #f0f0f0;
+    --container-bg: white;
+    --controls-bg: #f8f8f8;
+    --text-color: #333;
+    --border-color: #333;
+    --stats-bg: #fff;
+    --canvas-text: #333;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --container-bg: #2d2d2d;
+    --controls-bg: #363636;
+    --text-color: #ffffff;
+    --border-color: #4a4a4a;
+    --stats-bg: #2d2d2d;
+    --canvas-text: #ffffff;
+}
+
 body {
     margin: 0;
     padding: 20px;
@@ -5,22 +25,24 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f0f0f0;
+    background-color: var(--bg-color);
     font-family: Arial, sans-serif;
+    color: var(--text-color);
+    transition: background-color 0.3s ease;
 }
 
 .container {
     display: flex;
     gap: 20px;
-    background-color: white;
+    background-color: var(--container-bg);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #gameCanvas {
-    border: 2px solid #333;
-    background-color: #fff;
+    border: 2px solid var(--border-color);
+    background-color: var(--container-bg);
     border-radius: 4px;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -31,7 +53,7 @@ body {
     gap: 15px;
     min-width: 200px;
     padding: 15px;
-    background-color: #f8f8f8;
+    background-color: var(--controls-bg);
     border-radius: 8px;
 }
 
@@ -43,7 +65,7 @@ body {
 
 .speed-control label {
     font-weight: bold;
-    color: #333;
+    color: var(--text-color);
 }
 
 .speed-control input[type="range"] {
@@ -81,7 +103,7 @@ button:hover {
 #stats {
     margin-top: 20px;
     padding: 15px;
-    background-color: #fff;
+    background-color: var(--stats-bg);
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
@@ -89,7 +111,7 @@ button:hover {
 #stats p {
     margin: 8px 0;
     font-size: 14px;
-    color: #333;
+    color: var(--text-color);
     display: flex;
     justify-content: space-between;
 }
@@ -97,4 +119,53 @@ button:hover {
 #stats p span {
     font-weight: bold;
     color: #4CAF50;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background-color: var(--container-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.theme-toggle .light-icon,
+.theme-toggle .dark-icon {
+    font-size: 20px;
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+[data-theme="light"] .light-icon {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+[data-theme="light"] .dark-icon {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+[data-theme="dark"] .light-icon {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+[data-theme="dark"] .dark-icon {
+    opacity: 1;
+    transform: translateY(0);
 } 
