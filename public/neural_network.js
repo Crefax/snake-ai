@@ -66,6 +66,21 @@ class NeuralNetwork {
     setupUI() {
         document.getElementById('startAI').addEventListener('click', () => this.start());
         document.getElementById('stopAI').addEventListener('click', () => this.stop());
+        
+        // Model kaydetme ve yükleme butonları için event listener'lar
+        document.getElementById('saveModel').addEventListener('click', () => this.saveModel(this.jenerasyon));
+        document.getElementById('loadModel').addEventListener('click', () => {
+            document.getElementById('modelFile').click();
+        });
+
+        // Dosya seçildiğinde modeli yükle
+        document.getElementById('modelFile').addEventListener('change', async (e) => {
+            if (e.target.files[0]) {
+                await this.loadModel(e.target.files[0]);
+            }
+            // Input değerini sıfırla ki aynı dosyayı tekrar seçebilsin
+            e.target.value = '';
+        });
     }
 
     getState(gameState) {
@@ -229,8 +244,6 @@ class NeuralNetwork {
 
     async start() {
         this.running = true;
-        this.jenerasyon = 0;
-        this.totalScore = 0;
 
         while (this.running) {
             window.game.reset();
@@ -272,6 +285,107 @@ class NeuralNetwork {
 
     stop() {
         this.running = false;
+    }
+
+    async saveModel(generation) {
+        try {
+            // Model ağırlıklarını al
+            const modelWeights = [];
+            const weights = await this.model.getWeights();
+            
+            // Her katmanın ağırlıklarını diziye çevir
+            for (const weight of weights) {
+                modelWeights.push({
+                    name: weight.name,
+                    data: Array.from(weight.dataSync()),
+                    shape: weight.shape
+                });
+                weight.dispose();
+            }
+
+            // Model verilerini hazırla
+            const saveData = {
+                weights: modelWeights,
+                metadata: {
+                    generation: this.jenerasyon,
+                    epsilon: this.epsilon,
+                    totalScore: this.totalScore,
+                    inputSize: this.inputSize,
+                    hiddenSize: this.hiddenSize,
+                    outputSize: this.outputSize
+                }
+            };
+
+            // Dosyayı kaydet
+            const blob = new Blob([JSON.stringify(saveData)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `snake-model-gen${generation}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            alert(`Model ${generation}. jenerasyonda kaydedildi`);
+        } catch (error) {
+            console.error('Model kaydedilirken hata oluştu:', error);
+            alert('Model kaydedilirken hata oluştu: ' + error.message);
+        }
+    }
+
+    async loadModel(file) {
+        try {
+            if (!file) {
+                alert('Dosya seçilmedi');
+                return false;
+            }
+
+            const reader = new FileReader();
+            
+            const loadPromise = new Promise((resolve, reject) => {
+                reader.onload = async (event) => {
+                    try {
+                        const saveData = JSON.parse(event.target.result);
+                        
+                        // Yeni model oluştur
+                        this.inputSize = saveData.metadata.inputSize;
+                        this.hiddenSize = saveData.metadata.hiddenSize;
+                        this.outputSize = saveData.metadata.outputSize;
+                        this.createModel();
+
+                        // Ağırlıkları yükle
+                        const weights = saveData.weights.map(w => 
+                            tf.tensor(w.data, w.shape, 'float32')
+                        );
+                        this.model.setWeights(weights);
+
+                        // Metadata bilgilerini güncelle
+                        this.jenerasyon = saveData.metadata.generation;
+                        this.epsilon = saveData.metadata.epsilon;
+                        this.totalScore = saveData.metadata.totalScore;
+
+                        // UI'ı güncelle
+                        document.getElementById('jenerasyon').textContent = this.jenerasyon;
+                        document.getElementById('avgScore').textContent = (this.totalScore / this.jenerasyon).toFixed(2);
+
+                        alert(`Model başarıyla ${this.jenerasyon}. jenerasyondan yüklendi`);
+                        resolve(true);
+                    } catch (error) {
+                        console.error('Model yükleme hatası:', error);
+                        reject('Model yüklenirken hata oluştu: ' + (error.message || 'Bilinmeyen hata'));
+                    }
+                };
+            });
+
+            reader.readAsText(file);
+            return await loadPromise;
+
+        } catch (error) {
+            console.error('Model yükleme hatası:', error);
+            alert('Model yüklenirken hata oluştu: ' + (error.message || 'Bilinmeyen hata'));
+            return false;
+        }
     }
 }
 
