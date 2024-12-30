@@ -2,8 +2,7 @@ class SnakeGame {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.canvas.width = 400;
-        this.canvas.height = 400;
+        this.setupCanvas();
         this.gridSize = 20;
         this.snake = [{x: 4, y: 4}, {x: 3, y: 4}, {x: 2, y: 4}, {x: 1, y: 4}];
         this.direction = 'right';
@@ -18,6 +17,26 @@ class SnakeGame {
             this.speed = parseInt(this.speedRange.value);
         });
         this.food = this.generateFood();
+
+        // Pencere boyutu değiştiğinde canvas'ı yeniden boyutlandır
+        window.addEventListener('resize', () => {
+            this.setupCanvas();
+            this.draw();
+        });
+    }
+
+    setupCanvas() {
+        // Mobil cihazlar için canvas boyutunu ayarla
+        if (window.innerWidth <= 768) {
+            const containerWidth = Math.min(window.innerWidth - 20, 400);
+            this.canvas.width = containerWidth;
+            this.canvas.height = containerWidth;
+            this.gridSize = containerWidth / 20; // Grid sayısını sabit tut, boyutu ayarla
+        } else {
+            this.canvas.width = 400;
+            this.canvas.height = 400;
+            this.gridSize = 20;
+        }
     }
 
     generateFood() {
